@@ -84,16 +84,17 @@ public class MaterialEditTextDrawable extends AnimatedDrawable {
 		final int saveCount = canvas.save();
 		canvas.translate(bounds.left, bounds.top);
 		canvas.drawRect(getBounds().left, getBounds().bottom - mStrokeWidth, getBounds().right, getBounds().bottom, mPaint);
+
 		if (mAnimateFromCenter) {
-			float center = ((float) (getBounds().right - getBounds().left)) / 2.0f;
-			canvas.drawRect(center, getBounds().bottom - mStrokeWidth, center + mWidth, getBounds().bottom, mFocusedPaint);
-			canvas.drawRect(center - mWidth, getBounds().bottom - mStrokeWidth, center, getBounds().bottom, mFocusedPaint);
+			int w = getIntrinsicWidth();
+			float left = ((float) (w - mWidth)) / 2.0f;
+			float right = left + mWidth;
+			canvas.drawRect(left, getBounds().bottom - mStrokeWidth, right, getBounds().bottom, mFocusedPaint);
 		} else {
 			canvas.drawRect(getBounds().left, getBounds().bottom - mStrokeWidth, getBounds().left + mWidth, getBounds().bottom, mFocusedPaint);
 		}
 		canvas.restoreToCount(saveCount);
 	}
-
 
 	@Override
 	public void setAlpha(int alpha) {
