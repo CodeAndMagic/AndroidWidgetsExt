@@ -50,11 +50,14 @@
     <style name="EditTextStyle" parent="android:Widget.Holo.EditText">
         <item name="extensions">font|animatedBackground</item>
         <item name="backgroundStrokeWidth">2dp</item>
-        <item name="animatedBackgroundDrawable">ext.drawable.AnimatedEditTextBackgroundDrawable
-        </item>
+        <item name="animatedBackgroundDrawable">ext.drawable.MaterialEditTextDrawable</item>
         <item name="animateFromCenter">true</item>
         <item name="android:textAppearance">@style/TextAppearance</item>
         <item name="android:background">@null</item>
+    </style>
+
+    <style name="EditTextStyle.FromLeft">
+        <item name="animateFromCenter">false</item>
     </style>
 
 </resources>

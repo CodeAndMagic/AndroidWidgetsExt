@@ -22,7 +22,7 @@ import ext.R;
 /**
  * Created by evelina on 14/09/14.
  */
-public class AnimatedEditTextBackgroundDrawable extends AnimatedDrawable {
+public class MaterialEditTextDrawable extends AnimatedDrawable {
 
 	protected Rect mBounds;
 	protected Paint mPaint;
@@ -35,7 +35,7 @@ public class AnimatedEditTextBackgroundDrawable extends AnimatedDrawable {
 	protected int mWidth;
 	protected int mStrokeWidth;
 
-	public AnimatedEditTextBackgroundDrawable(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+	public MaterialEditTextDrawable(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
 		super(context, attrs, defStyleAttr, defStyleRes);
 
 		TypedArray array = context.obtainStyledAttributes(R.styleable.ThemeExtension);
