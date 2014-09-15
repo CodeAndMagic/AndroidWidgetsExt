@@ -1,0 +1,41 @@
+<resources>
+
+    <!-- Extensions styleable attributes -->
+    <declare-styleable name="ThemeExtension">
+        <attr name="colorPrimary" format="color|reference"/>
+        <attr name="colorPrimaryDark" format="color|reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="BorderExtension">
+        <attr name="borderColor" format="color|reference"/>
+        <attr name="borderWidth" format="dimension"/>
+        <attr name="borderPosition">
+            <flag name="top" value="0x01"/>
+            <flag name="left" value="0x02"/>
+            <flag name="right" value="0x04"/>
+            <flag name="bottom" value="0x08"/>
+        </attr>
+        <attr name="borderAnimated" format="boolean"/>
+    </declare-styleable>
+
+    <declare-styleable name="ClearableExtension">
+        <attr name="clearIcon" format="reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="PushButtonExtension">
+        <attr name="pushDepth" format="dimension"/>
+        <attr name="pushCornerRadius" format="integer"/>
+    </declare-styleable>
+
+    <!-- Widgets styleable attributes -->
+    <declare-styleable name="TextView">
+        <attr name="extensions">
+            <flag name="font" value="0x01"/>
+            <flag name="theme" value="0x02"/>
+            <flag name="border" value="0x04"/>
+            <flag name="clearable" value="0x08"/>
+            <flag name="pushButton" value="0x10"/>
+        </attr>
+    </declare-styleable>
+
+</resources>
