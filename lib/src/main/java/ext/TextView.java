@@ -9,14 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ext.extensions.ExtensionManager;
-import ext.extensions.TextExtension;
+import ext.extensions.ViewExtension;
 
 /**
  * Created by evelina on 26/08/14.
  */
 public class TextView extends android.widget.TextView {
 
-	protected List<TextExtension<TextView>> mExtensions = new ArrayList<>();
+	protected List<ViewExtension<TextView>> mExtensions = new ArrayList<>();
 
 	public TextView(Context context) {
 		super(context);
@@ -38,7 +38,7 @@ public class TextView extends android.widget.TextView {
 			return;
 		}
 		mExtensions = ExtensionManager.getExtensions(context, attrs, android.R.attr.textViewStyle, defStyleRes);
-		for (TextExtension<TextView> extension : mExtensions) {
+		for (ViewExtension<TextView> extension : mExtensions) {
 			extension.init(this, attrs, android.R.attr.textViewStyle, defStyleRes);
 		}
 	}
@@ -46,7 +46,7 @@ public class TextView extends android.widget.TextView {
 	@Override
 	protected void onFinishInflate() {
 		super.onFinishInflate();
-		for (TextExtension<TextView> extension : mExtensions) {
+		for (ViewExtension<TextView> extension : mExtensions) {
 			extension.onFinishInflate();
 		}
 	}
@@ -57,7 +57,7 @@ public class TextView extends android.widget.TextView {
 		if (mExtensions == null) {
 			return;
 		}
-		for (TextExtension<TextView> extension : mExtensions) {
+		for (ViewExtension<TextView> extension : mExtensions) {
 			extension.onTextChanged(text, start, lengthBefore, lengthAfter);
 		}
 	}
@@ -65,7 +65,7 @@ public class TextView extends android.widget.TextView {
 	@Override
 	protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
 		super.onFocusChanged(focused, direction, previouslyFocusedRect);
-		for (TextExtension<TextView> extension : mExtensions) {
+		for (ViewExtension<TextView> extension : mExtensions) {
 			extension.onFocusChanged(focused, direction, previouslyFocusedRect);
 		}
 	}
@@ -73,7 +73,7 @@ public class TextView extends android.widget.TextView {
 	@Override
 	protected void onAttachedToWindow() {
 		super.onAttachedToWindow();
-		for (TextExtension<TextView> extension : mExtensions) {
+		for (ViewExtension<TextView> extension : mExtensions) {
 			extension.onAttachedToWindow();
 		}
 	}
@@ -81,7 +81,7 @@ public class TextView extends android.widget.TextView {
 	@Override
 	protected void onDetachedFromWindow() {
 		super.onDetachedFromWindow();
-		for (TextExtension<TextView> extension : mExtensions) {
+		for (ViewExtension<TextView> extension : mExtensions) {
 			extension.onDetachedFromWindow();
 		}
 	}
@@ -89,7 +89,7 @@ public class TextView extends android.widget.TextView {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		for (TextExtension<TextView> extension : mExtensions) {
+		for (ViewExtension<TextView> extension : mExtensions) {
 			extension.onDraw(canvas);
 		}
 	}

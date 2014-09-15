@@ -10,14 +10,14 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.widget.TextView;
+import android.view.View;
 
 import ext.R;
 
 /**
  * Created by evelina on 11/09/14.
  */
-public class PushButtonExtension<T extends TextView> extends ThemeExtension<T> {
+public class PushButtonExtension<T extends View> extends ThemeExtension<T> {
 
 	protected int mPushDepth;
 	protected int mPushCornerRadius;
@@ -36,8 +36,8 @@ public class PushButtonExtension<T extends TextView> extends ThemeExtension<T> {
 
 		Context context = view.getContext();
 		TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.PushButtonExtension, defStyleAttr, defStyleRes);
-		mPushDepth = array.getDimensionPixelSize(R.styleable.PushButtonExtension_pushDepth, 0);
-		mPushCornerRadius = array.getDimensionPixelSize(R.styleable.PushButtonExtension_pushCornerRadius, 0);
+		mPushDepth = array.getDimensionPixelSize(R.styleable.PushButtonExtension_pushDepth, mPushDepth);
+		mPushCornerRadius = array.getDimensionPixelSize(R.styleable.PushButtonExtension_pushCornerRadius, mPushCornerRadius);
 		array.recycle();
 
 		mPaddingTop = mView.getPaddingTop();

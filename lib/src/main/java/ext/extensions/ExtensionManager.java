@@ -3,7 +3,7 @@ package ext.extensions;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.widget.TextView;
+import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -17,38 +17,43 @@ import ext.extensions.typeface.FontExtension;
  */
 public class ExtensionManager {
 
-    private static final int FONT_EXT = 0x01;
-    private static final int THEME_EXT = 0x02;
-    private static final int BORDER_EXT = 0x04;
-    private static final int CLEARABLE_EXT = 0x08;
+	private static final int FONT_EXT = 0x01;
+	private static final int THEME_EXT = 0x02;
+	private static final int BORDER_EXT = 0x04;
+	private static final int CLEARABLE_EXT = 0x08;
 	private static final int PUSH_BUTTON_EXT = 0x10;
+	private static final int ANIMATED_BG_EXT = 0x20;
 
-    public static <T extends TextView> List<TextExtension<T>> getExtensions(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        if (attrs == null) {
-            return Collections.emptyList();
-        }
+	public static <V extends View> List<ViewExtension<V>> getExtensions(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+		if (attrs == null) {
+			return Collections.emptyList();
+		}
 
-        List<TextExtension<T>> features = new ArrayList<>();
-        TypedArray array = context.obtainStyledAttributes(attrs, new int[]{R.attr.extensions}, defStyleAttr, defStyleRes);
+		TypedArray array = context.obtainStyledAttributes(attrs, new int[]{R.attr.extensions}, defStyleAttr, defStyleRes);
+		int featuresMask = array.getInt(0, 0);
+		array.recycle();
 
-        int featuresMask = array.getInt(0, 0);
-        if ((featuresMask & FONT_EXT) != 0) {
-            features.add(new FontExtension<T>());
-        }
-        if ((featuresMask & THEME_EXT) != 0) {
-            features.add(new ThemeExtension<T>());
-        }
-        if ((featuresMask & BORDER_EXT) != 0) {
-            features.add(new BorderExtension<T>());
-        }
-        if ((featuresMask & CLEARABLE_EXT) != 0) {
-            // TODO
-        }
-	    if ((featuresMask & PUSH_BUTTON_EXT) != 0) {
-		    features.add(new PushButtonExtension<T>());
-	    }
+		List<ViewExtension<V>> features = new ArrayList<>();
 
-        array.recycle();
-        return features;
-    }
+		if ((featuresMask & FONT_EXT) != 0) {
+			features.add(new FontExtension<V>());
+		}
+		if ((featuresMask & THEME_EXT) != 0) {
+			features.add(new ThemeExtension<V>());
+		}
+		if ((featuresMask & BORDER_EXT) != 0) {
+			features.add(new BorderExtension<V>());
+		}
+		if ((featuresMask & CLEARABLE_EXT) != 0) {
+			// TODO
+		}
+		if ((featuresMask & PUSH_BUTTON_EXT) != 0) {
+			features.add(new PushButtonExtension<V>());
+		}
+		if ((featuresMask & ANIMATED_BG_EXT) != 0) {
+			features.add(new AnimatedBackgroundExtension<V>());
+		}
+
+		return features;
+	}
 }

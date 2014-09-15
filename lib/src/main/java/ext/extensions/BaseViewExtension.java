@@ -45,4 +45,9 @@ public class BaseViewExtension<V extends View> extends ViewExtension<V> {
 		// not implemented
 		return false;
 	}
+
+	@Override
+	public void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter) {
+		// not implemented
+	}
 }

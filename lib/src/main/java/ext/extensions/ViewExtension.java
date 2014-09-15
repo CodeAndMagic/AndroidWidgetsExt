@@ -37,4 +37,6 @@ public abstract class ViewExtension<V extends View> {
 
 	public abstract boolean onTouchEvent(MotionEvent event);
 
+	public abstract void onTextChanged(CharSequence text, int start, int lengthBefore, int lengthAfter);
+
 }

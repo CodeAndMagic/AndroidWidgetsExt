@@ -2,20 +2,21 @@ package ext;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ext.extensions.ExtensionManager;
-import ext.extensions.TextExtension;
+import ext.extensions.ViewExtension;
 
 /**
  * Created by evelina on 27/08/14.
  */
 public class EditText extends android.widget.EditText {
 
-	protected List<TextExtension<EditText>> mExtensions = new ArrayList<>();
+	protected List<ViewExtension<EditText>> mExtensions = new ArrayList<>();
 
 	public EditText(Context context) {
 		super(context);
@@ -37,7 +38,7 @@ public class EditText extends android.widget.EditText {
 			return;
 		}
 		mExtensions = ExtensionManager.getExtensions(context, attrs, android.R.attr.editTextStyle, defStyleRes);
-		for (TextExtension<EditText> extension : mExtensions) {
+		for (ViewExtension<EditText> extension : mExtensions) {
 			extension.init(this, attrs, android.R.attr.editTextStyle, defStyleRes);
 		}
 	}
@@ -45,7 +46,7 @@ public class EditText extends android.widget.EditText {
 	@Override
 	protected void onAttachedToWindow() {
 		super.onAttachedToWindow();
-		for (TextExtension<EditText> extension : mExtensions) {
+		for (ViewExtension<EditText> extension : mExtensions) {
 			extension.onAttachedToWindow();
 		}
 	}
@@ -53,7 +54,7 @@ public class EditText extends android.widget.EditText {
 	@Override
 	protected void onDetachedFromWindow() {
 		super.onDetachedFromWindow();
-		for (TextExtension<EditText> extension : mExtensions) {
+		for (ViewExtension<EditText> extension : mExtensions) {
 			extension.onDetachedFromWindow();
 		}
 	}
@@ -61,7 +62,7 @@ public class EditText extends android.widget.EditText {
 	@Override
 	protected void onFinishInflate() {
 		super.onFinishInflate();
-		for (TextExtension<EditText> extension : mExtensions) {
+		for (ViewExtension<EditText> extension : mExtensions) {
 			extension.onFinishInflate();
 		}
 	}
@@ -69,8 +70,16 @@ public class EditText extends android.widget.EditText {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-		for (TextExtension<EditText> extension : mExtensions) {
+		for (ViewExtension<EditText> extension : mExtensions) {
 			extension.onDraw(canvas);
+		}
+	}
+
+	@Override
+	protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
+		super.onFocusChanged(focused, direction, previouslyFocusedRect);
+		for (ViewExtension<EditText> extension : mExtensions) {
+			extension.onFocusChanged(focused, direction, previouslyFocusedRect);
 		}
 	}
 }

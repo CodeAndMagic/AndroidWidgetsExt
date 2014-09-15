@@ -16,28 +16,20 @@ import static android.text.TextUtils.*;
 /**
  * Created by evelina on 10/09/14.
  */
-public class TypefaceManager {
+public class FontManager {
 
-	private static final TypefaceManager INSTANCE = new TypefaceManager();
+	private static final FontManager INSTANCE = new FontManager();
 
-	public static TypefaceManager getInstance() {
+	public static FontManager getInstance() {
 		return INSTANCE;
 	}
 
 	private final Map<Font, Typeface> mFontCache;
 	private final Set<FontExtractor> mFontExtractors;
 
-	private static final int[] themeAttributes = {
-		android.R.attr.textAppearance
-	};
-	private static final int[] appearanceAttributes = {
-		android.R.attr.textStyle,
-		android.R.attr.fontFamily
-	};
-
-	public TypefaceManager() {
-		this.mFontCache = new HashMap<>();
-		this.mFontExtractors = new HashSet<>();
+	public FontManager() {
+		mFontCache = new HashMap<>();
+		mFontExtractors = new HashSet<>();
 	}
 
 	public void addFontExtractor(FontExtractor fontExtractor) {
@@ -47,16 +39,12 @@ public class TypefaceManager {
 		mFontExtractors.add(fontExtractor);
 	}
 
-
 	public void applyFont(TextView view, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
 		Context context = view.getContext();
 
 		TypedArray taArray = obtainTextAppearanceArray(context, attrs, defStyleAttr, defStyleRes);
 		int attrFontFamily = obtainTextAppearanceFontFamily();
-		int attrTextStyle = obtainTextAppearanceTextStyle();
-
 		String fontFamily = null;
-		int textStyle = -1;
 
 		if (attrFontFamily != -1) {
 			int n = taArray.getIndexCount();
@@ -64,8 +52,7 @@ public class TypefaceManager {
 				int attr = taArray.getIndex(i);
 				if (attr == attrFontFamily) {
 					fontFamily = taArray.getString(attr);
-				} else if (attr == attrTextStyle) {
-					textStyle = taArray.getInt(attr, textStyle);
+					break;
 				}
 			}
 		}
@@ -76,7 +63,7 @@ public class TypefaceManager {
 		}
 
 		for (FontExtractor extractor : mFontExtractors) {
-			final Font font = extractor.getFont(fontFamily, textStyle);
+			final Font font = extractor.getFont(fontFamily);
 			if (font != null) {
 				applyTypeface(view, font);
 				break;
@@ -96,14 +83,13 @@ public class TypefaceManager {
 	}
 
 	private Typeface getTypeface(Context context, Font font) {
-
 		if (mFontCache.containsKey(font)) {
 			return mFontCache.get(font);
 		}
 
-		final Typeface typeface = Typeface.createFromAsset(context.getAssets(), font.getAsset());
+		final Typeface typeface = Typeface.createFromAsset(context.getAssets(), font.getName());
 		if (typeface == null) {
-			throw new RuntimeException("Can't create Typeface from '" + font.getAsset() + "'");
+			throw new RuntimeException("Can't create Typeface from '" + font.getName() + "'");
 		}
 
 		mFontCache.put(font, typeface);

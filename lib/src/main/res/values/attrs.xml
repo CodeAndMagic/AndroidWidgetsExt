@@ -15,7 +15,6 @@
             <flag name="right" value="0x04"/>
             <flag name="bottom" value="0x08"/>
         </attr>
-        <attr name="borderAnimated" format="boolean"/>
     </declare-styleable>
 
     <declare-styleable name="ClearableExtension">
@@ -24,18 +23,29 @@
 
     <declare-styleable name="PushButtonExtension">
         <attr name="pushDepth" format="dimension"/>
-        <attr name="pushCornerRadius" format="integer"/>
+        <attr name="pushCornerRadius" format="dimension"/>
+    </declare-styleable>
+
+    <declare-styleable name="AnimatedBackgroundExtension">
+        <attr name="animatedBackgroundDrawable" format="string"/>
+        <attr name="android:animationDuration"/>
     </declare-styleable>
 
     <!-- Widgets styleable attributes -->
-    <declare-styleable name="TextView">
+    <declare-styleable name="Widget">
         <attr name="extensions">
             <flag name="font" value="0x01"/>
             <flag name="theme" value="0x02"/>
             <flag name="border" value="0x04"/>
             <flag name="clearable" value="0x08"/>
             <flag name="pushButton" value="0x10"/>
+            <flag name="animatedBackground" value="0x20"/>
         </attr>
+    </declare-styleable>
+
+    <declare-styleable name="EditText">
+        <attr name="backgroundStrokeWidth" format="dimension"/>
+        <attr name="animateFromCenter" format="boolean"/>
     </declare-styleable>
 
 </resources>
