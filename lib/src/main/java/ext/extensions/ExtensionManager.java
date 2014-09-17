@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import ext.L;
 import ext.R;
 import ext.extensions.typeface.FontExtension;
 
@@ -20,14 +21,14 @@ import ext.extensions.typeface.FontExtension;
  */
 public class ExtensionManager {
 
-	private static Map<int[], ViewExtension> sExtensionMap = new HashMap<>();
+	private static Map<int[], Class<? extends ViewExtension>> sExtensionMap = new HashMap<>();
 
 	static {
-		sExtensionMap.put(R.styleable.ThemeExtension, new ThemeExtension());
-		sExtensionMap.put(R.styleable.FontExtension, new FontExtension());
-		sExtensionMap.put(R.styleable.BorderExtension, new BorderExtension());
-		sExtensionMap.put(R.styleable.PushButtonExtension, new PushButtonExtension());
-		sExtensionMap.put(R.styleable.AnimatedBackgroundExtension, new AnimatedBackgroundExtension());
+		sExtensionMap.put(R.styleable.ThemeExtension, ThemeExtension.class);
+		sExtensionMap.put(R.styleable.FontExtension, FontExtension.class);
+		sExtensionMap.put(R.styleable.BorderExtension, BorderExtension.class);
+		sExtensionMap.put(R.styleable.PushButtonExtension, PushButtonExtension.class);
+		sExtensionMap.put(R.styleable.AnimatedBackgroundExtension, AnimatedBackgroundExtension.class);
 	}
 
 	public static <V extends View> List<ViewExtension<V>> getExtensions(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -37,14 +38,23 @@ public class ExtensionManager {
 
 		List<ViewExtension<V>> extensions = new ArrayList<>();
 
-		for (Entry<int[], ViewExtension> entry : sExtensionMap.entrySet()) {
+		for (Entry<int[], Class<? extends ViewExtension>> entry : sExtensionMap.entrySet()) {
 			TypedArray array = context.obtainStyledAttributes(attrs, entry.getKey(), defStyleAttr, defStyleRes);
 			if (array.getIndexCount() > 0) {
-				extensions.add(entry.getValue());
+				extensions.add(newExtension(entry.getValue()));
 			}
 			array.recycle();
 		}
 
 		return extensions;
+	}
+
+	private static ViewExtension newExtension(Class<? extends ViewExtension> clazz) {
+		try {
+			return clazz.newInstance();
+		} catch (Exception e) {
+			L.log("Can't instantiate ViewExtension of class '{0}'.", clazz, e);
+			throw new RuntimeException("Can't instantiate ViewExtension of class " + clazz.getName());
+		}
 	}
 }

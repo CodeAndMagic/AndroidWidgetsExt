@@ -4,16 +4,13 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
-import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.Interpolator;
 
+import ext.L;
 import ext.R;
 import ext.drawable.AnimatedDrawable;
 
 import static android.text.TextUtils.*;
-import static ext.Const.*;
 
 /**
  * Created by evelina on 15/09/14.
@@ -44,7 +41,7 @@ public class AnimatedBackgroundExtension<V extends View> extends ThemeExtension<
 					.getConstructor(Context.class, AttributeSet.class, int.class, int.class)
 					.newInstance(context, attrs, defStyleAttr, defStyleRes);
 			} catch (Exception e) {
-				Log.e(TAG, "Cannot instantiate AnimatedDrawable of class '" + drawableClass + "'.", e);
+				L.log("Can't instantiate AnimatedDrawable of class '{0}'.", drawableClass, e);
 			}
 		}
 		return null;

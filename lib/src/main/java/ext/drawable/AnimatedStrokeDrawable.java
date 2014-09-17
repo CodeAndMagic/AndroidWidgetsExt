@@ -14,6 +14,7 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
 
+import ext.L;
 import ext.R;
 
 /**
@@ -25,12 +26,11 @@ public class AnimatedStrokeDrawable extends AnimatedDrawable {
 	protected Paint mPaint;
 	protected Paint mFocusedPaint;
 	protected ObjectAnimator mAnimator;
-	protected boolean mFocused;
-	protected boolean mStartDelayed;
 	protected boolean mAnimateFromCenter;
-
-	protected int mWidth;
 	protected int mStrokeWidth;
+	protected int mWidth;
+	protected boolean mFocused;
+	protected boolean mStartAfterBoundsSet;
 
 	public AnimatedStrokeDrawable(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
 		super(context, attrs, defStyleAttr, defStyleRes);
@@ -60,9 +60,9 @@ public class AnimatedStrokeDrawable extends AnimatedDrawable {
 	@Override
 	protected void onBoundsChange(Rect bounds) {
 		mBounds.set(bounds);
-		if (mStartDelayed) {
-			startAnimation();
-			mStartDelayed = false;
+		if (mStartAfterBoundsSet) {
+			animateFocus();
+			mStartAfterBoundsSet = false;
 		}
 	}
 
@@ -119,22 +119,25 @@ public class AnimatedStrokeDrawable extends AnimatedDrawable {
 			mAnimator = ObjectAnimator.ofInt(this, "width", 0, getIntrinsicWidth());
 			mAnimator.setDuration(mAnimationDuration);
 			mAnimator.setInterpolator(mInterpolator);
-		} else if (mAnimator.isRunning()) {
-			stopAnimation();
 		}
 		mAnimator.start();
+		L.log("startAnimation {0}", this);
 	}
 
 	private void reverseAnimation() {
 		if (mAnimator != null) {
-			stopAnimation();
 			mAnimator.reverse();
+			L.log("reverseAnimation {0}", this);
 		}
 	}
 
 	private void stopAnimation() {
-		mAnimator.removeAllListeners();
-		mAnimator.cancel();
+		if (mAnimator != null) {
+			mAnimator.removeAllListeners();
+			mAnimator.removeAllUpdateListeners();
+			mAnimator.cancel();
+			L.log("stopAnimation");
+		}
 	}
 
 	@Override
@@ -149,9 +152,10 @@ public class AnimatedStrokeDrawable extends AnimatedDrawable {
 
 	@Override
 	public void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
+		L.log("onFocusChanged {0}", focused);
 		mFocused = focused;
 		if (mBounds.isEmpty()) {
-			mStartDelayed = true;
+			mStartAfterBoundsSet = true;
 		} else {
 			animateFocus();
 		}

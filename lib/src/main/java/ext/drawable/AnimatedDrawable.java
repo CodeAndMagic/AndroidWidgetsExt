@@ -10,10 +10,10 @@ import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 
+import ext.L;
 import ext.R;
 
 import static android.text.TextUtils.*;
-import static ext.Const.*;
 
 /**
  * Created by evelina on 15/09/14.
@@ -42,7 +42,7 @@ public abstract class AnimatedDrawable extends Drawable {
 				return (Interpolator) Class.forName(interpolatorClass).newInstance();
 
 			} catch (Exception e) {
-				Log.e(TAG, "Cannot instantiate Interpolator of class '" + interpolatorClass + "'.", e);
+				L.log("Cannot instantiate Interpolator of class '{0}'.", interpolatorClass, e);
 			}
 		}
 		return new AccelerateDecelerateInterpolator();
