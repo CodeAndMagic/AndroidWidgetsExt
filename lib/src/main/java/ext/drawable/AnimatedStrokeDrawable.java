@@ -1,7 +1,5 @@
 package ext.drawable;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -15,27 +13,26 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
-import android.view.animation.DecelerateInterpolator;
 
 import ext.R;
 
 /**
  * Created by evelina on 14/09/14.
  */
-public class MaterialEditTextDrawable extends AnimatedDrawable {
+public class AnimatedStrokeDrawable extends AnimatedDrawable {
 
 	protected Rect mBounds;
 	protected Paint mPaint;
 	protected Paint mFocusedPaint;
 	protected ObjectAnimator mAnimator;
 	protected boolean mFocused;
-	protected boolean mStartAnimation;
+	protected boolean mStartDelayed;
 	protected boolean mAnimateFromCenter;
 
 	protected int mWidth;
 	protected int mStrokeWidth;
 
-	public MaterialEditTextDrawable(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+	public AnimatedStrokeDrawable(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
 		super(context, attrs, defStyleAttr, defStyleRes);
 
 		TypedArray array = context.obtainStyledAttributes(R.styleable.ThemeExtension);
@@ -43,10 +40,10 @@ public class MaterialEditTextDrawable extends AnimatedDrawable {
 		int colorPrimaryDark = array.getColor(R.styleable.ThemeExtension_colorPrimaryDark, Color.TRANSPARENT);
 		array.recycle();
 
-		array = context.obtainStyledAttributes(attrs, R.styleable.EditText, defStyleAttr, defStyleRes);
+		array = context.obtainStyledAttributes(attrs, R.styleable.AnimatedStrokeDrawable, defStyleAttr, defStyleRes);
 		mStrokeWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, context.getResources().getDisplayMetrics());
-		mStrokeWidth = array.getDimensionPixelSize(R.styleable.EditText_backgroundStrokeWidth, mStrokeWidth);
-		mAnimateFromCenter = array.getBoolean(R.styleable.EditText_animateFromCenter, mAnimateFromCenter);
+		mStrokeWidth = array.getDimensionPixelSize(R.styleable.AnimatedStrokeDrawable_animatedStrokeWidth, mStrokeWidth);
+		mAnimateFromCenter = array.getBoolean(R.styleable.AnimatedStrokeDrawable_animateFromCenter, mAnimateFromCenter);
 		array.recycle();
 
 		mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -63,8 +60,9 @@ public class MaterialEditTextDrawable extends AnimatedDrawable {
 	@Override
 	protected void onBoundsChange(Rect bounds) {
 		mBounds.set(bounds);
-		if (mStartAnimation) {
+		if (mStartDelayed) {
 			startAnimation();
+			mStartDelayed = false;
 		}
 	}
 
@@ -116,25 +114,27 @@ public class MaterialEditTextDrawable extends AnimatedDrawable {
 		invalidateSelf();
 	}
 
-	@Override
-	public void startAnimation() {
+	private void startAnimation() {
 		if (mAnimator == null) {
 			mAnimator = ObjectAnimator.ofInt(this, "width", 0, getIntrinsicWidth());
 			mAnimator.setDuration(mAnimationDuration);
-			mAnimator.setInterpolator(new DecelerateInterpolator());
-			mAnimator.addListener(new AnimatorListenerAdapter() {
-				@Override
-				public void onAnimationEnd(Animator animation) {
-					mStartAnimation = false;
-				}
-			});
+			mAnimator.setInterpolator(mInterpolator);
+		} else if (mAnimator.isRunning()) {
+			stopAnimation();
 		}
 		mAnimator.start();
 	}
 
-	@Override
-	public void reverseAnimation() {
-		mAnimator.reverse();
+	private void reverseAnimation() {
+		if (mAnimator != null) {
+			stopAnimation();
+			mAnimator.reverse();
+		}
+	}
+
+	private void stopAnimation() {
+		mAnimator.removeAllListeners();
+		mAnimator.cancel();
 	}
 
 	@Override
@@ -144,16 +144,14 @@ public class MaterialEditTextDrawable extends AnimatedDrawable {
 
 	@Override
 	public void onViewDetachedToWindow(View view) {
-		if (mAnimator != null) {
-			mAnimator.cancel();
-		}
+		stopAnimation();
 	}
 
 	@Override
 	public void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
 		mFocused = focused;
 		if (mBounds.isEmpty()) {
-			mStartAnimation = true;
+			mStartDelayed = true;
 		} else {
 			animateFocus();
 		}

@@ -1,6 +1,9 @@
 <resources>
 
-    <!-- Extensions styleable attributes -->
+    <declare-styleable name="FontExtension">
+        <attr name="android:textAppearance"/>
+    </declare-styleable>
+
     <declare-styleable name="ThemeExtension">
         <attr name="colorPrimary" format="color|reference"/>
         <attr name="colorPrimaryDark" format="color|reference"/>
@@ -27,25 +30,19 @@
     </declare-styleable>
 
     <declare-styleable name="AnimatedBackgroundExtension">
-        <attr name="animatedBackgroundDrawable" format="string"/>
         <attr name="android:animationDuration"/>
+        <attr name="drawableClass" format="string"/>
+        <attr name="interpolatorClass" format="string"/>
     </declare-styleable>
 
-    <!-- Widgets styleable attributes -->
-    <declare-styleable name="Widget">
-        <attr name="extensions">
-            <flag name="font" value="0x01"/>
-            <flag name="theme" value="0x02"/>
-            <flag name="border" value="0x04"/>
-            <flag name="clearable" value="0x08"/>
-            <flag name="pushButton" value="0x10"/>
-            <flag name="animatedBackground" value="0x20"/>
-        </attr>
-    </declare-styleable>
-
-    <declare-styleable name="EditText">
-        <attr name="backgroundStrokeWidth" format="dimension"/>
+    <declare-styleable name="AnimatedStrokeDrawable">
         <attr name="animateFromCenter" format="boolean"/>
+        <attr name="animatedStrokeWidth" format="dimension"/>
     </declare-styleable>
+
+    <declare-styleable name="AnimatedRippleDrawable">
+        <!-- todo -->
+    </declare-styleable>
+
 
 </resources>

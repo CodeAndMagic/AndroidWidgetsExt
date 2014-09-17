@@ -7,7 +7,10 @@ import android.view.View;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import ext.R;
 import ext.extensions.typeface.FontExtension;
@@ -17,43 +20,31 @@ import ext.extensions.typeface.FontExtension;
  */
 public class ExtensionManager {
 
-	private static final int FONT_EXT = 0x01;
-	private static final int THEME_EXT = 0x02;
-	private static final int BORDER_EXT = 0x04;
-	private static final int CLEARABLE_EXT = 0x08;
-	private static final int PUSH_BUTTON_EXT = 0x10;
-	private static final int ANIMATED_BG_EXT = 0x20;
+	private static Map<int[], ViewExtension> sExtensionMap = new HashMap<>();
+
+	static {
+		sExtensionMap.put(R.styleable.ThemeExtension, new ThemeExtension());
+		sExtensionMap.put(R.styleable.FontExtension, new FontExtension());
+		sExtensionMap.put(R.styleable.BorderExtension, new BorderExtension());
+		sExtensionMap.put(R.styleable.PushButtonExtension, new PushButtonExtension());
+		sExtensionMap.put(R.styleable.AnimatedBackgroundExtension, new AnimatedBackgroundExtension());
+	}
 
 	public static <V extends View> List<ViewExtension<V>> getExtensions(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
 		if (attrs == null) {
 			return Collections.emptyList();
 		}
 
-		TypedArray array = context.obtainStyledAttributes(attrs, new int[]{R.attr.extensions}, defStyleAttr, defStyleRes);
-		int featuresMask = array.getInt(0, 0);
-		array.recycle();
+		List<ViewExtension<V>> extensions = new ArrayList<>();
 
-		List<ViewExtension<V>> features = new ArrayList<>();
-
-		if ((featuresMask & FONT_EXT) != 0) {
-			features.add(new FontExtension<V>());
-		}
-		if ((featuresMask & THEME_EXT) != 0) {
-			features.add(new ThemeExtension<V>());
-		}
-		if ((featuresMask & BORDER_EXT) != 0) {
-			features.add(new BorderExtension<V>());
-		}
-		if ((featuresMask & CLEARABLE_EXT) != 0) {
-			// TODO
-		}
-		if ((featuresMask & PUSH_BUTTON_EXT) != 0) {
-			features.add(new PushButtonExtension<V>());
-		}
-		if ((featuresMask & ANIMATED_BG_EXT) != 0) {
-			features.add(new AnimatedBackgroundExtension<V>());
+		for (Entry<int[], ViewExtension> entry : sExtensionMap.entrySet()) {
+			TypedArray array = context.obtainStyledAttributes(attrs, entry.getKey(), defStyleAttr, defStyleRes);
+			if (array.getIndexCount() > 0) {
+				extensions.add(entry.getValue());
+			}
+			array.recycle();
 		}
 
-		return features;
+		return extensions;
 	}
 }

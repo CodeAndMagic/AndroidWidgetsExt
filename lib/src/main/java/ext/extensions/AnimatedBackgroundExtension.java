@@ -6,6 +6,8 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.Interpolator;
 
 import ext.R;
 import ext.drawable.AnimatedDrawable;
@@ -26,22 +28,26 @@ public class AnimatedBackgroundExtension<V extends View> extends ThemeExtension<
 
 		Context context = view.getContext();
 		TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.AnimatedBackgroundExtension, defStyleAttr, defStyleRes);
-		String animatedDrawableClass = array.getString(R.styleable.AnimatedBackgroundExtension_animatedBackgroundDrawable);
+		String drawableClass = array.getString(R.styleable.AnimatedBackgroundExtension_drawableClass);
 		array.recycle();
 
-		if (!isEmpty(animatedDrawableClass)) {
+		mAnimatedDrawable = instantiateDrawable(drawableClass, context, attrs, defStyleAttr, defStyleRes);
+		if (mAnimatedDrawable == null) {
+			throw new IllegalArgumentException("AnimatedDrawable class '" + drawableClass + "' not found.");
+		}
+	}
+
+	private AnimatedDrawable instantiateDrawable(String drawableClass, Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+		if (!isEmpty(drawableClass)) {
 			try {
-				mAnimatedDrawable = (AnimatedDrawable) Class.forName(animatedDrawableClass)
+				return (AnimatedDrawable) Class.forName(drawableClass)
 					.getConstructor(Context.class, AttributeSet.class, int.class, int.class)
 					.newInstance(context, attrs, defStyleAttr, defStyleRes);
 			} catch (Exception e) {
-				Log.e(TAG, "Cannot instantiate the AnimatedDrawable of class '" + animatedDrawableClass + "'.", e);
+				Log.e(TAG, "Cannot instantiate AnimatedDrawable of class '" + drawableClass + "'.", e);
 			}
 		}
-
-		if (mAnimatedDrawable == null) {
-			throw new IllegalArgumentException("Please provide an AnimatedDrawable subclass.");
-		}
+		return null;
 	}
 
 	@Override
@@ -61,18 +67,18 @@ public class AnimatedBackgroundExtension<V extends View> extends ThemeExtension<
 	}
 
 	@Override
-	public void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
-		super.onFocusChanged(focused, direction, previouslyFocusedRect);
-		if (mAnimatedDrawable != null) {
-			mAnimatedDrawable.onFocusChanged(focused, direction, previouslyFocusedRect);
-		}
-	}
-
-	@Override
 	public void onFinishInflate() {
 		super.onFinishInflate();
 		if (mAnimatedDrawable != null) {
 			mView.setBackground(mAnimatedDrawable);
+		}
+	}
+
+	@Override
+	public void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
+		super.onFocusChanged(focused, direction, previouslyFocusedRect);
+		if (mAnimatedDrawable != null) {
+			mAnimatedDrawable.onFocusChanged(focused, direction, previouslyFocusedRect);
 		}
 	}
 }

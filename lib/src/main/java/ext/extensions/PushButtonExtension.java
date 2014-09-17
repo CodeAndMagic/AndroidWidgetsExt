@@ -10,14 +10,14 @@ import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.RoundRectShape;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
-import android.view.View;
 
+import ext.Button;
 import ext.R;
 
 /**
  * Created by evelina on 11/09/14.
  */
-public class PushButtonExtension<T extends View> extends ThemeExtension<T> {
+public class PushButtonExtension<T extends Button> extends ThemeExtension<T> {
 
 	protected int mPushDepth;
 	protected int mPushCornerRadius;
