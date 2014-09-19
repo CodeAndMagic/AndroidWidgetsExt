@@ -46,7 +46,7 @@ android.libraryVariants.all { variant ->
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.google.guava:guava-jdk5:17.0'
+    compile 'joda-time:joda-time:2.4'
 }
 
 afterEvaluate { project ->

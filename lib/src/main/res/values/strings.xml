@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="form_error_min_length">This value need to have at least %d characters.</string>
+    <string name="form_error_max_length">This value need to have at most %d characters.</string>
+    <string name="form_error_int">This needs to be a number.</string>
+    <string name="form_error_min">This needs to be at least %s.</string>
+    <string name="form_error_max">This need to be at the most %s.</string>
+</resources>
