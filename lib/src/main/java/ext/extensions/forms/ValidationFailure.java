@@ -22,6 +22,13 @@ public class ValidationFailure {
 		return context.getString(errorMessageId, args);
 	}
 
+	public String toString(Context context) {
+		return "ValidationFailure{" +
+			"key='" + key + '\'' +
+			", errorMessage=" + getMessage(context) +
+			'}';
+	}
+
 	@Override
 	public String toString() {
 		return "ValidationFailure{" +

@@ -14,7 +14,6 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
 
-import ext.L;
 import ext.R;
 
 /**
@@ -121,13 +120,11 @@ public class AnimatedStrokeDrawable extends AnimatedDrawable {
 			mAnimator.setInterpolator(mInterpolator);
 		}
 		mAnimator.start();
-		L.log("startAnimation {0}", this);
 	}
 
 	private void reverseAnimation() {
 		if (mAnimator != null) {
 			mAnimator.reverse();
-			L.log("reverseAnimation {0}", this);
 		}
 	}
 
@@ -136,7 +133,6 @@ public class AnimatedStrokeDrawable extends AnimatedDrawable {
 			mAnimator.removeAllListeners();
 			mAnimator.removeAllUpdateListeners();
 			mAnimator.cancel();
-			L.log("stopAnimation");
 		}
 	}
 
@@ -152,7 +148,6 @@ public class AnimatedStrokeDrawable extends AnimatedDrawable {
 
 	@Override
 	public void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
-		L.log("onFocusChanged {0}", focused);
 		mFocused = focused;
 		if (mBounds.isEmpty()) {
 			mStartAfterBoundsSet = true;

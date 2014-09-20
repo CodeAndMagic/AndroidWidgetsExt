@@ -3,10 +3,8 @@ package ext.extensions.forms;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -41,46 +39,52 @@ public class DateMultiInput extends Input<DateTime> {
 
 	@Override
 	public DateTime bind(Map<String, String> data) throws ValidationException {
-		final int day, month, year;
+		List<ValidationFailure> failures = new ArrayList<>();
+
+		int day = -1, month = -1, year = -1;
 		try {
 			day = Integer.parseInt(data.get(dayKey));
+			if (day < 1) {
+				failures.add(new ValidationFailure(dayKey, R.string.form_error_min, 1));
+			}
 		} catch (NumberFormatException e) {
-			throw new ValidationException(dayKey, R.string.form_error_int);
+			failures.add(new ValidationFailure(dayKey, R.string.form_error_int));
 		}
 		try {
 			month = Integer.parseInt(data.get(monthKey));
+			if (month < 1) {
+				failures.add(new ValidationFailure(monthKey, R.string.form_error_min, 1));
+			}
+			if (month > 12) {
+				failures.add(new ValidationFailure(monthKey, R.string.form_error_min, 12));
+			}
 		} catch (NumberFormatException e) {
-			throw new ValidationException(monthKey, R.string.form_error_int);
+			failures.add(new ValidationFailure(monthKey, R.string.form_error_int));
 		}
 		try {
 			year = Integer.parseInt(data.get(yearKey));
 		} catch (NumberFormatException e) {
-			throw new ValidationException(yearKey, R.string.form_error_int);
+			failures.add(new ValidationFailure(yearKey, R.string.form_error_int));
 		}
-		if(day < 1){
-			throw new ValidationException(dayKey, R.string.form_error_min, 1);
-		}
-		if(month < 1){
-			throw new ValidationException(monthKey, R.string.form_error_min, 1);
-		}
-		if(month > 12){
-			throw new ValidationException(monthKey, R.string.form_error_min, 12);
+
+		if (failures.size() > 0) {
+			throw new ValidationException(failures.toArray(new ValidationFailure[failures.size()]));
 		}
 
 		DateTime cal = new DateTime(year, month, 1, 0, 0, DateTimeZone.forTimeZone(TimeZone.getDefault()));
 		final int maxDay = cal.dayOfMonth().getMaximumValue();
 
-		if(day > maxDay){
+		if (day > maxDay) {
 			throw new ValidationException(dayKey, R.string.form_error_max, maxDay);
 		}
 
 		final DateTime result = cal.withDayOfMonth(day);
 
-		if(result.isBefore(min))
+		if (min != null && result.isBefore(min))
 			throw new ValidationException(key, R.string.form_error_min, min.toString("dd/MM/yyyy"));
 
-		if(result.isAfter(min))
-			throw new ValidationException(key, R.string.form_error_max, min.toString("dd/MM/yyyy"));
+		if (max != null && result.isAfter(max))
+			throw new ValidationException(key, R.string.form_error_max, max.toString("dd/MM/yyyy"));
 
 		return result;
 	}

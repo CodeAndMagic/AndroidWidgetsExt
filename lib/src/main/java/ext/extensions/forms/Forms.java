@@ -2,6 +2,8 @@ package ext.extensions.forms;
 
 import android.view.View;
 import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
@@ -9,6 +11,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import ext.R;
 
 /**
  * Created by evelina on 20/09/14.
@@ -20,15 +24,15 @@ public class Forms {
 	}
 
 	public static <T> Form<T> single(final Input<T> input, TextView view) {
-		return new SingleForm<>(input, new ViewPair<>(view, TEXT_VIEW_EXTRACTOR));
+		return new SingleForm<>(input, new ViewPair<>(view, TEXT_VIEW_EXTRACTOR, TEXT_ERROR_HANDLER));
 	}
 
 	public static <T> Form<T> single(final Input<T> input, CompoundButton view) {
-		return new SingleForm<>(input, new ViewPair<>(view, COMPOUND_BUTTON_EXTRACTOR));
+		return new SingleForm<>(input, new ViewPair<>(view, COMPOUND_BUTTON_EXTRACTOR, TEXT_ERROR_HANDLER));
 	}
 
 	public static <T> Form<T> single(final Input<T> input, RadioGroup view) {
-		return new SingleForm<>(input, new ViewPair<>(view, RADIO_GROUP_EXTRACTOR));
+		return new SingleForm<>(input, new ViewPair<>(view, RADIO_GROUP_EXTRACTOR, RADIO_GROUP_ERROR_HANDLER));
 	}
 
 	public static Form<Map<String, Object>> multiple(final Input<?>[] inputs, Map<String, ViewPair<?>> views) {
@@ -53,41 +57,50 @@ public class Forms {
 			return this;
 		}
 
-		public synchronized <V extends View> FormBuilder addView(String key, V view, ViewExtractor<V> extractor) {
-			mViewMap.put(key, new ViewPair<V>(view, extractor));
+		public synchronized <V extends View> FormBuilder addView(String key, V view, ViewExtractor<? super V> extractor, ViewErrorHandler<? super V> errorHandler) {
+			mViewMap.put(key, new ViewPair<V>(view, extractor, errorHandler));
 			return this;
 		}
 
 		public synchronized FormBuilder addView(String key, TextView view) {
-			return addView(key, view, TEXT_VIEW_EXTRACTOR);
+			return addView(key, view, TEXT_VIEW_EXTRACTOR, TEXT_ERROR_HANDLER);
+		}
+
+		public synchronized FormBuilder addView(String key, EditText view) {
+			return addView(key, view, TEXT_VIEW_EXTRACTOR, EDIT_TEXT_ERROR_HANDLER);
 		}
 
 		public synchronized FormBuilder addView(String key, RadioGroup view) {
-			return addView(key, view, RADIO_GROUP_EXTRACTOR);
+			return addView(key, view, RADIO_GROUP_EXTRACTOR, RADIO_GROUP_ERROR_HANDLER);
 		}
 
 		public synchronized FormBuilder addView(String key, CompoundButton view) {
-			return addView(key, view, COMPOUND_BUTTON_EXTRACTOR);
+			return addView(key, view, COMPOUND_BUTTON_EXTRACTOR, TEXT_ERROR_HANDLER);
 		}
 
-		public synchronized <V extends View> FormBuilder addViewAndInput(V view, ViewExtractor<V> extractor, Input<?> input) {
-			addView(input.key, view, extractor);
+		public synchronized <V extends View> FormBuilder addViewAndInput(V view, ViewExtractor<? super V> extractor, ViewErrorHandler<? super V> errorHandler, Input<?> input) {
+			addView(input.key, view, extractor, errorHandler);
 			return addInput(input);
 		}
 
 		public synchronized FormBuilder addViewAndInput(TextView view, Input<?> input) {
 			addInput(input);
-			return addView(input.key, view, TEXT_VIEW_EXTRACTOR);
+			return addView(input.key, view);
+		}
+
+		public synchronized FormBuilder addViewAndInput(EditText view, Input<?> input) {
+			addInput(input);
+			return addView(input.key, view);
 		}
 
 		public synchronized FormBuilder addViewAndInput(RadioGroup view, Input<?> input) {
 			addInput(input);
-			return addView(input.key, view, RADIO_GROUP_EXTRACTOR);
+			return addView(input.key, view);
 		}
 
 		public synchronized FormBuilder addViewAndInput(CompoundButton view, Input<?> input) {
 			addInput(input);
-			return addView(input.key, view, COMPOUND_BUTTON_EXTRACTOR);
+			return addView(input.key, view);
 		}
 
 		public synchronized Form<Map<String, Object>> build() {
@@ -141,4 +154,27 @@ public class Forms {
 		}
 	};
 
+	public static ViewErrorHandler<TextView> TEXT_ERROR_HANDLER = new ViewErrorHandler<TextView>() {
+		@Override
+		public void onError(TextView view, ValidationFailure[] failures) {
+			view.setTextColor(view.getContext().getResources().getColor(R.color.error));
+		}
+	};
+
+	public static ViewErrorHandler<EditText> EDIT_TEXT_ERROR_HANDLER = new ViewErrorHandler<EditText>() {
+		@Override
+		public void onError(EditText view, ValidationFailure[] failures) {
+			view.setError(failures[0].getMessage(view.getContext()));
+		}
+	};
+
+	public static ViewErrorHandler<RadioGroup> RADIO_GROUP_ERROR_HANDLER = new ViewErrorHandler<RadioGroup>() {
+		@Override
+		public void onError(RadioGroup view, ValidationFailure[] failures) {
+			RadioButton radio = (RadioButton) view.findViewById(view.getCheckedRadioButtonId());
+			if (radio != null) {
+				radio.setTextColor(view.getContext().getResources().getColor(R.color.error));
+			}
+		}
+	};
 }

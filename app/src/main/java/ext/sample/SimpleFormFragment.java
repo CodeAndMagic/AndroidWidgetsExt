@@ -17,7 +17,6 @@ import java.util.Map;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import ext.extensions.forms.Condition;
-import ext.extensions.forms.DateInput;
 import ext.extensions.forms.DateMultiInput;
 import ext.extensions.forms.Form;
 import ext.extensions.forms.Forms.FormBuilder;
@@ -54,7 +53,7 @@ public class SimpleFormFragment extends Fragment {
 			@Override
 			public boolean verify(DateTime value) {
 				// at least 18
-				return value.isBefore(DateTime.now().minusYears(18));
+				return value.isAfter(DateTime.now().minusYears(18));
 			}
 		}, R.string.birthday_error));
 		builder.addViewAndInput((RadioGroup) view.findViewById(R.id.gender),
@@ -62,8 +61,12 @@ public class SimpleFormFragment extends Fragment {
 				@Override
 				public Gender bind(String value) throws ValidationException {
 					try {
-						return Gender.valueOf(value.toUpperCase());
-					} catch (IllegalArgumentException e) {
+						int id = Integer.parseInt(value);
+						if (id == R.id.male) return Gender.MALE;
+						if (id == R.id.female) return Gender.FEMALE;
+						throw new ValidationException("gender", R.string.gender_error);
+
+					} catch (NumberFormatException e) {
 						throw new ValidationException("gender", R.string.gender_error);
 					}
 				}
@@ -99,7 +102,7 @@ public class SimpleFormFragment extends Fragment {
 			User user = mForm.bind();
 			Log.i("FORMS", "Validation passed: " + user);
 		} catch (ValidationException e) {
-			Log.i("FORMS", "Validation failed: " + e);
+			Log.i("FORMS", "Validation failed: " + e.toString(getActivity()));
 		}
 	}
 

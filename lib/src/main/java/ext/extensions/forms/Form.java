@@ -11,6 +11,8 @@ import java.util.Map.Entry;
 
 import ext.extensions.forms.Forms.ViewExtractor;
 
+import static android.text.TextUtils.*;
+
 /**
  * Created by evelina on 17/09/14.
  */
@@ -29,7 +31,32 @@ public abstract class Form<T> {
 		for (Entry<String, ViewPair<?>> view : views.entrySet()) {
 			data.put(view.getKey(), view.getValue().get());
 		}
-		return bind(data);
+		try {
+			return bind(data);
+		} catch (ValidationException e) {
+			onValidationError(e);
+			throw e;
+		}
+	}
+
+	private void onValidationError(ValidationException e) {
+		Map<String, List<ValidationFailure>> failureMap = new HashMap<>();
+		for (ValidationFailure failure : e.failures) {
+			if (!failureMap.containsKey(failure.key)) {
+				failureMap.put(failure.key, new ArrayList<ValidationFailure>());
+			}
+			failureMap.get(failure.key).add(failure);
+		}
+
+		for (Entry<String, List<ValidationFailure>> entry : failureMap.entrySet()) {
+			String key = entry.getKey();
+			if (!isEmpty(key)) {
+				ViewPair<?> viewPair = views.get(key);
+				if (viewPair != null) {
+					viewPair.onError(entry.getValue());
+				}
+			}
+		}
 	}
 
 	public abstract T bind(Map<String, String> data) throws ValidationException;
@@ -89,14 +116,20 @@ class ObjectForm<T> extends Form<T> {
 
 class ViewPair<V extends View> {
 	public final V view;
-	public final ViewExtractor<V> extractor;
+	public final ViewExtractor<? super V> extractor;
+	public final ViewErrorHandler<? super V> errorHandler;
 
-	ViewPair(V view, ViewExtractor<V> extractor) {
+	ViewPair(V view, ViewExtractor<? super V> extractor, ViewErrorHandler<? super V> errorHandler) {
 		this.view = view;
 		this.extractor = extractor;
+		this.errorHandler = errorHandler;
 	}
 
 	public String get() {
 		return extractor.get(view);
+	}
+
+	public void onError(List<ValidationFailure> failures) {
+		errorHandler.onError(view, failures.toArray(new ValidationFailure[failures.size()]));
 	}
 }

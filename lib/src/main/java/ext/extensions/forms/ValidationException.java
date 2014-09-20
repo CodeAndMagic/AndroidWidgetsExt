@@ -1,5 +1,7 @@
 package ext.extensions.forms;
 
+import android.content.Context;
+
 import java.util.Arrays;
 
 /**
@@ -14,6 +16,21 @@ public class ValidationException extends Exception {
 
 	public ValidationException(String key, int errorMessageId, Object... args) {
 		this(new ValidationFailure(key, errorMessageId, args));
+	}
+
+	public String toString(Context context) {
+		StringBuilder b = new StringBuilder("ValidationException {failures=");
+		boolean firstLine = true;
+		for (ValidationFailure failure : failures) {
+			if (firstLine) {
+				firstLine = false;
+			} else {
+				b.append(",");
+			}
+			b.append(failure.toString(context));
+		}
+		b.append("}");
+		return b.toString();
 	}
 
 	@Override
