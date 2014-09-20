@@ -10,7 +10,6 @@ import java.util.Map.Entry;
  * Created by evelina on 17/09/14.
  */
 public abstract class Form<T> {
-
 	public final Input<?>[] inputs;
 	public final Map<String, ViewPair<?>> views;
 
