@@ -1,15 +1,10 @@
 package ext.extensions.forms;
 
 import android.view.View;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import ext.extensions.forms.Forms.ViewExtractor;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Created by evelina on 17/09/14.
