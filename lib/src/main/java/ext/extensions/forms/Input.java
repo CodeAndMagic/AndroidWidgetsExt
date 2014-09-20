@@ -81,4 +81,18 @@ public abstract class Input<T> {
 			}
 		};
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Input input = (Input) o;
+		if (key != null ? !key.equals(input.key) : input.key != null) return false;
+		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return key != null ? key.hashCode() : 0;
+	}
 }

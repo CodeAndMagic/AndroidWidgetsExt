@@ -2,6 +2,8 @@ package ext.extensions.forms;
 
 import android.content.Context;
 
+import java.util.Arrays;
+
 /**
  * Created by evelina on 17/09/14.
  */
@@ -16,7 +18,16 @@ public class ValidationFailure {
 		this.args = args;
 	}
 
-	public String getMessage(Context context){
+	public String getMessage(Context context) {
 		return context.getString(errorMessageId, args);
+	}
+
+	@Override
+	public String toString() {
+		return "ValidationFailure{" +
+			"key='" + key + '\'' +
+			", errorMessageId=" + errorMessageId +
+			", args=" + Arrays.toString(args) +
+			'}';
 	}
 }

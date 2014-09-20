@@ -1,9 +1,13 @@
 package ext.sample;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 
 public class HomeActivity extends Activity {
@@ -12,6 +16,7 @@ public class HomeActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+	    ButterKnife.inject(this);
     }
 
 
@@ -33,4 +38,9 @@ public class HomeActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+	@OnClick(R.id.button)
+	void openForm() {
+		startActivity(new Intent(this, FormActivity.class));
+	}
 }
