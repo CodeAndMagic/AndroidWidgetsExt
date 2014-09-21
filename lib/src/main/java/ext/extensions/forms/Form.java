@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import ext.extensions.forms.Forms.ViewExtractor;
-
 import static android.text.TextUtils.*;
 
 /**
@@ -20,10 +18,12 @@ public abstract class Form<T> {
 
 	public final Input<?>[] inputs;
 	public final Map<String, ViewPair<?>> views;
+	public final Map<String, ErrorHandler[]> errorHandlers;
 
-	protected Form(Input<?>[] inputs, Map<String, ViewPair<?>> views) {
+	protected Form(Input<?>[] inputs, Map<String, ViewPair<?>> views, Map<String, ErrorHandler[]> errorHandlers) {
 		this.inputs = inputs;
 		this.views = views;
+		this.errorHandlers = errorHandlers;
 	}
 
 	public T bind() throws ValidationException {
@@ -51,9 +51,11 @@ public abstract class Form<T> {
 		for (Entry<String, List<ValidationFailure>> entry : failureMap.entrySet()) {
 			String key = entry.getKey();
 			if (!isEmpty(key)) {
-				ViewPair<?> viewPair = views.get(key);
-				if (viewPair != null) {
-					viewPair.onError(entry.getValue());
+				ErrorHandler[] handlers = errorHandlers.get(key);
+				if (handlers != null) {
+					for (ErrorHandler h : handlers) {
+						h.onError(entry.getValue().toArray(new ValidationFailure[entry.getValue().size()]));
+					}
 				}
 			}
 		}
@@ -62,24 +64,10 @@ public abstract class Form<T> {
 	public abstract T bind(Map<String, String> data) throws ValidationException;
 }
 
-class SingleForm<T> extends Form<T> {
-
-	SingleForm(final Input<T> input, final ViewPair<?> view) {
-		super(new Input[]{input}, new HashMap<String, ViewPair<?>>() {{
-			put(input.key, view);
-		}});
-	}
-
-	@Override
-	public T bind(Map<String, String> data) throws ValidationException {
-		return (T) data.get(inputs[0].key);
-	}
-}
-
 class MapForm extends Form<Map<String, Object>> {
 
-	MapForm(Input<?>[] inputs, Map<String, ViewPair<?>> views) {
-		super(inputs, views);
+	MapForm(Input<?>[] inputs, Map<String, ViewPair<?>> views, Map<String, ErrorHandler[]> errorHandlers) {
+		super(inputs, views, errorHandlers);
 	}
 
 	@Override
@@ -102,10 +90,10 @@ class ObjectForm<T> extends Form<T> {
 	public final Mapping<Map<String, Object>, T> mapping;
 	private final MapForm mMapForm;
 
-	ObjectForm(Mapping<Map<String, Object>, T> mapping, Input<?>[] inputs, Map<String, ViewPair<?>> views) {
-		super(inputs, views);
+	ObjectForm(Mapping<Map<String, Object>, T> mapping, Input<?>[] inputs, Map<String, ViewPair<?>> views, Map<String, ErrorHandler[]> errorHandlers) {
+		super(inputs, views, errorHandlers);
 		this.mapping = mapping;
-		mMapForm = new MapForm(inputs, views);
+		mMapForm = new MapForm(inputs, views, errorHandlers);
 	}
 
 	@Override
@@ -117,19 +105,13 @@ class ObjectForm<T> extends Form<T> {
 class ViewPair<V extends View> {
 	public final V view;
 	public final ViewExtractor<? super V> extractor;
-	public final ViewErrorHandler<? super V> errorHandler;
 
-	ViewPair(V view, ViewExtractor<? super V> extractor, ViewErrorHandler<? super V> errorHandler) {
+	ViewPair(V view, ViewExtractor<? super V> extractor) {
 		this.view = view;
 		this.extractor = extractor;
-		this.errorHandler = errorHandler;
 	}
 
 	public String get() {
 		return extractor.get(view);
-	}
-
-	public void onError(List<ValidationFailure> failures) {
-		errorHandler.onError(view, failures.toArray(new ValidationFailure[failures.size()]));
 	}
 }

@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 
 import org.joda.time.DateTime;
 
@@ -19,10 +20,11 @@ import butterknife.OnClick;
 import ext.extensions.forms.Condition;
 import ext.extensions.forms.DateMultiInput;
 import ext.extensions.forms.Form;
-import ext.extensions.forms.Forms.FormBuilder;
+import ext.extensions.forms.FormBuilder;
 import ext.extensions.forms.Mapping;
 import ext.extensions.forms.StringInput;
 import ext.extensions.forms.ValidationException;
+import ext.extensions.forms.ViewErrorHandler;
 import ext.sample.SimpleFormFragment.User.Gender;
 
 
@@ -53,7 +55,7 @@ public class SimpleFormFragment extends Fragment {
 			@Override
 			public boolean verify(DateTime value) {
 				// at least 18
-				return value.isAfter(DateTime.now().minusYears(18));
+				return value.isBefore(DateTime.now().minusYears(18));
 			}
 		}, R.string.birthday_error));
 		builder.addViewAndInput((RadioGroup) view.findViewById(R.id.gender),
@@ -76,6 +78,7 @@ public class SimpleFormFragment extends Fragment {
 					return value.name();
 				}
 			}));
+		builder.addErrorHandler(new ViewErrorHandler((TextView) view.findViewById(R.id.birthday_error)), "birthday");
 
 		mForm = builder.build(new Mapping<Map<String, Object>, User>() {
 			@Override

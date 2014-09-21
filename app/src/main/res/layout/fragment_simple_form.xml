@@ -70,6 +70,16 @@
 
     </LinearLayout>
 
+    <ext.TextView
+        android:id="@+id/birthday_error"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@color/error"
+        android:textColor="@android:color/white"
+        android:textSize="12sp"
+        android:visibility="gone"/>
+
     <ext.Button
         android:id="@+id/submit"
         android:layout_width="wrap_content"
