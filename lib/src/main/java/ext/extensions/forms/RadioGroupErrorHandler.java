@@ -11,6 +11,7 @@ import ext.R;
 public class RadioGroupErrorHandler implements ErrorHandler {
 
 	public final RadioGroup view;
+	private int mColor;
 
 	public RadioGroupErrorHandler(RadioGroup view) {
 		this.view = view;
@@ -20,7 +21,16 @@ public class RadioGroupErrorHandler implements ErrorHandler {
 	public void onError(ValidationFailure[] failures) {
 		RadioButton radio = (RadioButton) view.findViewById(view.getCheckedRadioButtonId());
 		if (radio != null) {
+			mColor = radio.getCurrentTextColor();
 			radio.setTextColor(view.getContext().getResources().getColor(R.color.error));
+		}
+	}
+
+	@Override
+	public void reset() {
+		RadioButton radio = (RadioButton) view.findViewById(view.getCheckedRadioButtonId());
+		if (radio != null) {
+			radio.setTextColor(mColor);
 		}
 	}
 }

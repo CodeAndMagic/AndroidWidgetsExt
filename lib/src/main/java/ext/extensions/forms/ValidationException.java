@@ -3,12 +3,17 @@ package ext.extensions.forms;
 import android.content.Context;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Created by evelina on 17/09/14.
  */
 public class ValidationException extends Exception {
 	public final ValidationFailure[] failures;
+
+	public ValidationException(List<ValidationFailure> failures) {
+		this(failures.toArray(new ValidationFailure[failures.size()]));
+	}
 
 	public ValidationException(ValidationFailure... failures) {
 		this.failures = failures;

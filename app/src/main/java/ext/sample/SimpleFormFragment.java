@@ -47,10 +47,13 @@ public class SimpleFormFragment extends Fragment {
 		super.onViewCreated(view, savedInstanceState);
 
 		FormBuilder builder = new FormBuilder();
+
 		builder.addViewAndInput((EditText) view.findViewById(R.id.username), new StringInput("username", 6, 32));
+
 		builder.addView("birthday_day", (EditText) view.findViewById(R.id.birthday_day));
 		builder.addView("birthday_month", (EditText) view.findViewById(R.id.birthday_month));
 		builder.addView("birthday_year", (EditText) view.findViewById(R.id.birthday_year));
+
 		builder.addInput(new DateMultiInput("birthday").verifying(new Condition<DateTime>() {
 			@Override
 			public boolean verify(DateTime value) {
@@ -58,6 +61,7 @@ public class SimpleFormFragment extends Fragment {
 				return value.isBefore(DateTime.now().minusYears(18));
 			}
 		}, R.string.birthday_error));
+
 		builder.addViewAndInput((RadioGroup) view.findViewById(R.id.gender),
 			new StringInput("gender").map(new Mapping<String, Gender>() {
 				@Override
@@ -78,7 +82,10 @@ public class SimpleFormFragment extends Fragment {
 					return value.name();
 				}
 			}));
+
 		builder.addErrorHandler(new ViewErrorHandler((TextView) view.findViewById(R.id.birthday_error)), "birthday");
+
+		builder.setOnTheFlyValidation(true);
 
 		mForm = builder.build(new Mapping<Map<String, Object>, User>() {
 			@Override

@@ -24,6 +24,7 @@ public class FormBuilder {
 	private Set<Input<?>> mInputs = new HashSet<>();
 	private Map<String, ViewPair<?>> mViewMap = new HashMap<>();
 	private Map<String, List<ErrorHandler>> mErrorHandlers = new HashMap<>();
+	private boolean mOnTheFlyValidation = false;
 
 	private Input<?>[] toArray() {
 		return mInputs.toArray(new Input<?>[mInputs.size()]);
@@ -106,11 +107,16 @@ public class FormBuilder {
 		return this;
 	}
 
+	public synchronized FormBuilder setOnTheFlyValidation(boolean onTheFlyValidation) {
+		mOnTheFlyValidation = onTheFlyValidation;
+		return this;
+	}
+
 	public synchronized Form<Map<String, Object>> build() {
-		return new MapForm(toArray(), mViewMap, toErrorHandlerArray());
+		return new MapForm(toArray(), mViewMap, toErrorHandlerArray(), mOnTheFlyValidation);
 	}
 
 	public synchronized <T> Form<T> build(Mapping<Map<String, Object>, T> mapping) {
-		return new ObjectForm(mapping, toArray(), mViewMap, toErrorHandlerArray());
+		return new ObjectForm(mapping, toArray(), mViewMap, toErrorHandlerArray(), mOnTheFlyValidation);
 	}
 }

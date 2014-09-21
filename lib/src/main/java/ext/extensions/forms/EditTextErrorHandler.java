@@ -17,4 +17,9 @@ public class EditTextErrorHandler implements ErrorHandler {
 	public void onError(ValidationFailure[] failures) {
 		view.setError(failures[0].getMessage(view.getContext()));
 	}
+
+	@Override
+	public void reset() {
+		view.setError(null);
+	}
 }

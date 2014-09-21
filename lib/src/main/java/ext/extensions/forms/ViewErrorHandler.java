@@ -19,4 +19,10 @@ public class ViewErrorHandler implements ErrorHandler {
 		errorView.setText(failures[0].getMessage(errorView.getContext()));
 		errorView.setVisibility(View.VISIBLE);
 	}
+
+	@Override
+	public void reset() {
+		errorView.setText("");
+		errorView.setVisibility(View.GONE);
+	}
 }

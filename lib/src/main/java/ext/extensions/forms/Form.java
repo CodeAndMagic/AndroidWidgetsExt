@@ -19,25 +19,22 @@ public abstract class Form<T> {
 	public final Input<?>[] inputs;
 	public final Map<String, ViewPair<?>> views;
 	public final Map<String, ErrorHandler[]> errorHandlers;
+	public final boolean onTheFlyValidation;
 
-	protected Form(Input<?>[] inputs, Map<String, ViewPair<?>> views, Map<String, ErrorHandler[]> errorHandlers) {
+	protected Form(Input<?>[] inputs,
+	               Map<String, ViewPair<?>> views,
+	               Map<String, ErrorHandler[]> errorHandlers,
+	               boolean onTheFlyValidation) {
+
 		this.inputs = inputs;
 		this.views = views;
 		this.errorHandlers = errorHandlers;
+		this.onTheFlyValidation = onTheFlyValidation;
+		if(onTheFlyValidation){
+			addOnTheFlyValidationListeners();
+		}
 	}
 
-	public T bind() throws ValidationException {
-		Map<String, String> data = new HashMap<>();
-		for (Entry<String, ViewPair<?>> view : views.entrySet()) {
-			data.put(view.getKey(), view.getValue().get());
-		}
-		try {
-			return bind(data);
-		} catch (ValidationException e) {
-			onValidationError(e);
-			throw e;
-		}
-	}
 
 	private void onValidationError(ValidationException e) {
 		Map<String, List<ValidationFailure>> failureMap = new HashMap<>();
@@ -61,13 +58,73 @@ public abstract class Form<T> {
 		}
 	}
 
+	private void resetValidationErrors() {
+		if (!errorHandlers.isEmpty()) {
+			for (ErrorHandler[] handlers : errorHandlers.values()) {
+				for (ErrorHandler handler : handlers) {
+					handler.reset();
+				}
+			}
+		}
+	}
+
+	private void addOnTheFlyValidationListeners() {
+		for (final Entry<String, ViewPair<?>> entry : views.entrySet()) {
+			entry.getValue().setOnDataChangeListener(new OnDataChangeListener() {
+				@Override
+				public void onDataChanged(String oldValue, String newValue) {
+					Form.this.onDataChanged(entry.getKey(), oldValue, newValue);
+				}
+			});
+		}
+	}
+
+	protected void onDataChanged(final String key, final String oldValue, final String newValue) {
+		Map<String, String> partialData = extractData();
+		List<ValidationFailure> failures = new ArrayList<>();
+		for (Input input : inputs) {
+			try {
+				input.onDataChanged(key, oldValue, newValue, partialData);
+			} catch (ValidationException e) {
+				failures.addAll(Arrays.asList(e.failures));
+			}
+		}
+		if(!failures.isEmpty()) {
+			onValidationError(new ValidationException(failures));
+		}
+	}
+
+	private Map<String, String> extractData() {
+		Map<String, String> data = new HashMap<>();
+		for (Entry<String, ViewPair<?>> view : views.entrySet()) {
+			data.put(view.getKey(), view.getValue().get());
+		}
+		return data;
+	}
+
+	public T bind() throws ValidationException {
+		Map<String, String> data = extractData();
+		resetValidationErrors();
+
+		try {
+			return bind(data);
+		} catch (ValidationException e) {
+			onValidationError(e);
+			throw e;
+		}
+	}
+
 	public abstract T bind(Map<String, String> data) throws ValidationException;
 }
 
 class MapForm extends Form<Map<String, Object>> {
 
-	MapForm(Input<?>[] inputs, Map<String, ViewPair<?>> views, Map<String, ErrorHandler[]> errorHandlers) {
-		super(inputs, views, errorHandlers);
+	MapForm(Input<?>[] inputs,
+	        Map<String, ViewPair<?>> views,
+	        Map<String, ErrorHandler[]> errorHandlers,
+	        boolean onTheFlyValidation) {
+
+		super(inputs, views, errorHandlers, onTheFlyValidation);
 	}
 
 	@Override
@@ -82,7 +139,7 @@ class MapForm extends Form<Map<String, Object>> {
 			}
 		}
 		if (failures.isEmpty()) return values;
-		else throw new ValidationException(failures.toArray(new ValidationFailure[0]));
+		else throw new ValidationException(failures);
 	}
 }
 
@@ -90,10 +147,15 @@ class ObjectForm<T> extends Form<T> {
 	public final Mapping<Map<String, Object>, T> mapping;
 	private final MapForm mMapForm;
 
-	ObjectForm(Mapping<Map<String, Object>, T> mapping, Input<?>[] inputs, Map<String, ViewPair<?>> views, Map<String, ErrorHandler[]> errorHandlers) {
-		super(inputs, views, errorHandlers);
+	ObjectForm(Mapping<Map<String, Object>, T> mapping,
+	           Input<?>[] inputs,
+	           Map<String, ViewPair<?>> views,
+	           Map<String, ErrorHandler[]> errorHandlers,
+	           boolean onTheFlyValidation) {
+
+		super(inputs, views, errorHandlers, onTheFlyValidation);
 		this.mapping = mapping;
-		mMapForm = new MapForm(inputs, views, errorHandlers);
+		mMapForm = new MapForm(inputs, views, errorHandlers, onTheFlyValidation);
 	}
 
 	@Override
@@ -113,5 +175,9 @@ class ViewPair<V extends View> {
 
 	public String get() {
 		return extractor.get(view);
+	}
+
+	public void setOnDataChangeListener(OnDataChangeListener onDataChangeListener) {
+		extractor.addChangeListener(view, onDataChangeListener);
 	}
 }

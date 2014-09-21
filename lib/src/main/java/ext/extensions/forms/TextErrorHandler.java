@@ -10,6 +10,7 @@ import ext.R;
 public class TextErrorHandler implements ErrorHandler {
 
 	public final TextView view;
+	private int mColor;
 
 	public TextErrorHandler(TextView textView) {
 		this.view = textView;
@@ -17,6 +18,12 @@ public class TextErrorHandler implements ErrorHandler {
 
 	@Override
 	public void onError(ValidationFailure[] failures) {
+		mColor = view.getCurrentTextColor();
 		view.setTextColor(view.getContext().getResources().getColor(R.color.error));
+	}
+
+	@Override
+	public void reset() {
+		view.setTextColor(mColor);
 	}
 }

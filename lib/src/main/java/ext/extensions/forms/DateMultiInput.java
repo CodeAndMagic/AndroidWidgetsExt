@@ -1,5 +1,7 @@
 package ext.extensions.forms;
 
+import android.util.Log;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
@@ -9,6 +11,8 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import ext.R;
+
+import static android.text.TextUtils.isEmpty;
 
 /**
  * Created by evelina on 19/09/14.
@@ -68,7 +72,7 @@ public class DateMultiInput extends Input<DateTime> {
 		}
 
 		if (failures.size() > 0) {
-			throw new ValidationException(failures.toArray(new ValidationFailure[failures.size()]));
+			throw new ValidationException(failures);
 		}
 
 		DateTime cal = new DateTime(year, month, 1, 0, 0, DateTimeZone.forTimeZone(TimeZone.getDefault()));
@@ -92,5 +96,20 @@ public class DateMultiInput extends Input<DateTime> {
 	@Override
 	public Map<String, String> unbind(DateTime value) {
 		return super.unbind(value);
+	}
+
+	@Override
+	protected void onDataChanged(String key, String oldValue, String newValue, Map<String, String> partialData) throws ValidationException {
+		Log.d("form", "DateMultiInput: " + key + " changed to " + newValue);
+		if(key.equals(dayKey) || key.equals(monthKey) || key.equals(yearKey)){
+			String day = partialData.get(dayKey);
+			String month = partialData.get(monthKey);
+			String year = partialData.get(yearKey);
+
+			if(!isEmpty(day) && !isEmpty(month) && !isEmpty(year)){
+				// FIXME the bind should be done on the Input resulting from verifying() or map()
+				bind(partialData);
+			}
+		}
 	}
 }

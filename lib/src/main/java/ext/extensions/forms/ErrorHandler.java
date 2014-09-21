@@ -6,4 +6,6 @@ package ext.extensions.forms;
 public interface ErrorHandler {
 
 	void onError(ValidationFailure[] failures);
+
+	void reset();
 }
