@@ -1,8 +1,8 @@
 <resources>
 
     <style name="AppTheme" parent="android:Theme.Holo.Light.DarkActionBar">
-        <item name="colorPrimary">#9c0</item>
-        <item name="colorPrimaryDark">#690</item>
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimaryDark">@color/primaryDark</item>
         <item name="android:textViewStyle">@style/TextViewStyle</item>
         <item name="android:editTextStyle">@style/EditTextStyle</item>
         <item name="android:buttonStyle">@style/ButtonStyle</item>
@@ -44,11 +44,15 @@
     </style>
 
     <style name="EditTextStyle" parent="android:Widget.Holo.EditText">
-        <item name="animatedStrokeWidth">2dp</item>
+        <item name="strokeWidth">2dp</item>
         <item name="drawableClass">ext.drawable.AnimatedStrokeDrawable</item>
         <item name="animateFromCenter">true</item>
         <item name="android:textAppearance">@style/TextAppearance</item>
-        <item name="android:background">@null</item>
+        <item name="android:background">@color/neutral</item>
+        <item name="android:paddingTop">8dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
     </style>
 
     <style name="EditTextStyle.FromLeft">

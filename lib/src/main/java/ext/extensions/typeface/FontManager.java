@@ -1,7 +1,6 @@
 package ext.extensions.typeface;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
 import android.widget.TextView;
@@ -40,24 +39,8 @@ public class FontManager {
 	}
 
 	public void applyFont(TextView view, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-		Context context = view.getContext();
 
-		TypedArray taArray = obtainTextAppearanceArray(context, attrs, defStyleAttr, defStyleRes);
-		int attrFontFamily = obtainTextAppearanceFontFamily();
-		String fontFamily = null;
-
-		if (attrFontFamily != -1) {
-			int n = taArray.getIndexCount();
-			for (int i = 0; i < n; i++) {
-				int attr = taArray.getIndex(i);
-				if (attr == attrFontFamily) {
-					fontFamily = taArray.getString(attr);
-					break;
-				}
-			}
-		}
-		taArray.recycle();
-
+		String fontFamily = FontExtension.obtainTextAppearanceFontFamily(view.getContext(), attrs, defStyleAttr, defStyleRes);
 		if (isEmpty(fontFamily)) {
 			return;
 		}
@@ -96,70 +79,5 @@ public class FontManager {
 		return typeface;
 	}
 
-	private TypedArray obtainTextAppearanceArray(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-		int textViewAppearanceAttrs[] = obtainTextViewAppearance();
 
-		if (textViewAppearanceAttrs != null) {
-
-			TypedArray textViewAppearance = context.getTheme().obtainStyledAttributes(attrs, textViewAppearanceAttrs, defStyleAttr, defStyleRes);
-			int textViewAppearanceTextAppearanceAttr = obtainTextViewAppearanceTextAppearance();
-
-			if (textViewAppearanceTextAppearanceAttr != -1) {
-
-				int textAppearanceResId = textViewAppearance.getResourceId(textViewAppearanceTextAppearanceAttr, -1);
-				int textAppearanceAttrs[] = obtainTextAppearance();
-
-				if (textAppearanceResId != -1 && textAppearanceAttrs != null) {
-					return context.getTheme().obtainStyledAttributes(textAppearanceResId, textAppearanceAttrs);
-				}
-			}
-			textViewAppearance.recycle();
-		}
-		return null;
-	}
-
-	private int[] obtainTextViewAppearance() {
-		try {
-			Class clazz = Class.forName("com.android.internal.R$styleable");
-			return (int[]) clazz.getField("TextViewAppearance").get(clazz);
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	private int obtainTextViewAppearanceTextAppearance() {
-		try {
-			Class clazz = Class.forName("com.android.internal.R$styleable");
-			return clazz.getField("TextViewAppearance_textAppearance").getInt(clazz);
-		} catch (Exception e) {
-			return -1;
-		}
-	}
-
-	private int[] obtainTextAppearance() {
-		try {
-			Class clazz = Class.forName("com.android.internal.R$styleable");
-			return (int[]) clazz.getField("TextAppearance").get(clazz);
-		} catch (Exception e) {
-			return null;
-		}
-	}
-
-	private int obtainTextAppearanceFontFamily() {
-		try {
-			Class clazz = Class.forName("com.android.internal.R$styleable");
-			return clazz.getField("TextAppearance_fontFamily").getInt(clazz);
-		} catch (Exception e) {
-			return -1;
-		}
-	}
-
-	private int obtainTextAppearanceTextStyle() {
-		try {
-			Class clazz = Class.forName("com.android.internal.R$styleable");
-			return clazz.getField("TextAppearance_textStyle").getInt(clazz);
-		} catch (Exception e) {
-			return -1;
-		}
-	}
 }

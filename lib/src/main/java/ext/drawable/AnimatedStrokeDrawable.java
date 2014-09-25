@@ -3,6 +3,8 @@ package ext.drawable;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.Config;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
@@ -41,23 +43,24 @@ public class AnimatedStrokeDrawable extends AnimatedDrawable {
 
 		array = context.obtainStyledAttributes(attrs, R.styleable.AnimatedStrokeDrawable, defStyleAttr, defStyleRes);
 		mStrokeWidth = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 1, context.getResources().getDisplayMetrics());
-		mStrokeWidth = array.getDimensionPixelSize(R.styleable.AnimatedStrokeDrawable_animatedStrokeWidth, mStrokeWidth);
+		mStrokeWidth = array.getDimensionPixelSize(R.styleable.AnimatedStrokeDrawable_strokeWidth, mStrokeWidth);
 		mAnimateFromCenter = array.getBoolean(R.styleable.AnimatedStrokeDrawable_animateFromCenter, mAnimateFromCenter);
 		array.recycle();
 
 		mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mPaint.setStyle(Style.FILL);
-		mPaint.setColor(colorPrimary);
+		mPaint.setColor(colorPrimaryDark);
 
 		mFocusedPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		mFocusedPaint.setStyle(Style.FILL);
-		mFocusedPaint.setColor(colorPrimaryDark);
+		mFocusedPaint.setColor(colorPrimary);
 
 		mBounds = new Rect();
 	}
 
 	@Override
 	protected void onBoundsChange(Rect bounds) {
+		super.onBoundsChange(bounds);
 		mBounds.set(bounds);
 		if (mStartAfterBoundsSet) {
 			animateFocus();
@@ -77,30 +80,29 @@ public class AnimatedStrokeDrawable extends AnimatedDrawable {
 
 	@Override
 	public void draw(Canvas canvas) {
+
 		final Rect bounds = getBounds();
 		final int saveCount = canvas.save();
+
 		canvas.translate(bounds.left, bounds.top);
-		canvas.drawRect(getBounds().left, getBounds().bottom - mStrokeWidth, getBounds().right, getBounds().bottom, mPaint);
+		if (mBackground == null) {
+			canvas.drawRect(bounds.left, bounds.bottom - mStrokeWidth, bounds.right, bounds.bottom, mPaint);
+		} else {
+			Bitmap bitmap = Bitmap.createBitmap(mBounds.width(), mStrokeWidth, Config.ARGB_8888);
+			Canvas bgCanvas = new Canvas(bitmap);
+			mBackground.draw(bgCanvas);
+			canvas.drawBitmap(bitmap, bounds.left, bounds.bottom - mStrokeWidth, mPaint);
+		}
 
 		if (mAnimateFromCenter) {
 			int w = getIntrinsicWidth();
 			float left = ((float) (w - mWidth)) / 2.0f;
 			float right = left + mWidth;
-			canvas.drawRect(left, getBounds().bottom - mStrokeWidth, right, getBounds().bottom, mFocusedPaint);
+			canvas.drawRect(left, bounds.bottom - mStrokeWidth, right, bounds.bottom, mFocusedPaint);
 		} else {
-			canvas.drawRect(getBounds().left, getBounds().bottom - mStrokeWidth, getBounds().left + mWidth, getBounds().bottom, mFocusedPaint);
+			canvas.drawRect(bounds.left, bounds.bottom - mStrokeWidth, bounds.left + mWidth, bounds.bottom, mFocusedPaint);
 		}
 		canvas.restoreToCount(saveCount);
-	}
-
-	@Override
-	public void setAlpha(int alpha) {
-		// nothing
-	}
-
-	@Override
-	public void setColorFilter(ColorFilter cf) {
-		// nothing
 	}
 
 	@Override
@@ -134,6 +136,16 @@ public class AnimatedStrokeDrawable extends AnimatedDrawable {
 			mAnimator.removeAllUpdateListeners();
 			mAnimator.cancel();
 		}
+	}
+
+	@Override
+	public void setAlpha(int alpha) {
+		// nothing
+	}
+
+	@Override
+	public void setColorFilter(ColorFilter cf) {
+		// nothing
 	}
 
 	@Override

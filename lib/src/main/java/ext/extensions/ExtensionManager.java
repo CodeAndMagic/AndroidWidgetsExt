@@ -41,7 +41,34 @@ public class ExtensionManager {
 		for (Entry<int[], Class<? extends ViewExtension>> entry : sExtensionMap.entrySet()) {
 			TypedArray array = context.obtainStyledAttributes(attrs, entry.getKey(), defStyleAttr, defStyleRes);
 			if (array.getIndexCount() > 0) {
-				extensions.add(newExtension(entry.getValue()));
+				Class<? extends ViewExtension> clazz = entry.getValue();
+				boolean add = false;
+
+				if (FontExtension.class == clazz) {
+					int fontFamilyAttr = FontExtension.obtainTextAppearanceFontFamily();
+					if (array.getIndex(fontFamilyAttr) > 0) {
+						String fontFamily = FontExtension.obtainTextAppearanceFontFamily(context, attrs, defStyleAttr, defStyleRes);
+						if (fontFamily != null) {
+							add = true;
+						}
+					}
+
+				} else if (BorderExtension.class == clazz &&
+					array.getDimension(R.styleable.BorderExtension_borderWidth, 0) > 0) {
+					add = true;
+
+				} else if (PushButtonExtension.class == clazz &&
+					array.getDimension(R.styleable.PushButtonExtension_pushDepth, 0) > 0) {
+					add = true;
+
+				} else if (AnimatedBackgroundExtension.class == clazz &&
+					array.getString(R.styleable.AnimatedBackgroundExtension_drawableClass) != null) {
+					add = true;
+				}
+
+				if (add) {
+					extensions.add(newExtension(clazz));
+				}
 			}
 			array.recycle();
 		}
